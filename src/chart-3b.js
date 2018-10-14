@@ -17,25 +17,24 @@ let pie = d3
   .value(1 / 12)
   .sort(null)
 
-let radiusScale = d3.scaleLinear().range([0, 90])
+let radius = 100
+
+let radiusScale = d3
+  .scaleLinear()
+  .domain([0, 120])
+  .range([0, radius])
 
 let arc = d3
   .arc()
-  .innerRadius()
+  .innerRadius(0)
   .outerRadius(d => radiusScale(d.data.high_temp))
 
 let colorScale = d3
-  // different type of scale
-  .scaleQuantize()
-  .range(['#e5f5e0', '#a1d99b', '#31a354'])
-// '#feb24c', '#f03b20', '#c51b8a
+  .scaleLinear()
+  .domain([0, 120])
+  .range(['#a1d99b', '#31a354'])
 
-let arcLabel = d3
-  .arc()
-  .innerRadius(0)
-  .outerRadius(d => radiusScale(d.data.high_temp) + 20)
-
-let xPositionScale = d3.scaleBand().range([0, width])
+let xPositionScale = d3.scalePoint().range([0, width])
 
 d3.csv(require('./data/all-temps.csv'))
   .then(ready)
@@ -48,8 +47,6 @@ function ready(datapoints) {
       return d.city
     })
     .entries(datapoints)
-
-  // console.log(nested)
 
   let keys = nested.map(d => d.key)
   xPositionScale.domain(keys)
