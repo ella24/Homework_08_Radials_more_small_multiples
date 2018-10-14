@@ -1,8 +1,8 @@
 import * as d3 from 'd3'
 
-var margin = { top: 30, left: 30, right: 30, bottom: 30 }
-var height = 400 - margin.top - margin.bottom
-var width = 780 - margin.left - margin.right
+let margin = { top: 30, left: 30, right: 30, bottom: 30 }
+let height = 400 - margin.top - margin.bottom
+let width = 780 - margin.left - margin.right
 
 let svg = d3
   .select('#chart-3')
@@ -30,7 +30,7 @@ let arc = d3
 let colorScale = d3
   // different type of scale
   .scaleQuantize()
-  .range(['#e5f5e0', '#a1d99b', '#31a354', '#feb24c', '#f03b20'])
+  .range(['#c51b8a', '#e5f5e0', '#a1d99b', '#31a354', '#feb24c', '#f03b20'])
 
 let arcLabel = d3
   .arc()
@@ -46,15 +46,15 @@ function ready(datapoints) {
     .append('g')
     .attr('transform', `translate(${width / 2},${height / 2})`)
 
-  let alltemp = datapoints.map(d => +d.high_temp)
-  colorScale.domain(d3.extent(alltemp))
+  let temps = datapoints.map(d => +d.high_temp)
+  colorScale.domain(d3.extent(temps))
 
   container
-    .selectAll('.path-chart')
+    .selectAll('.chart-3-path')
     .data(pie(datapoints))
     .enter()
     .append('path')
-    .attr('class', 'path-chart')
+    .attr('class', 'chart-3-path')
     .attr('d', d => arc(d))
     .attr('fill', d => colorScale(d.data.high_temp))
 
