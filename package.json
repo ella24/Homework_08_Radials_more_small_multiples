@@ -6,9 +6,9 @@
   "scripts": {
     "test": "jest",
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html --out-dir docs --public-url /sample-d3-project"
-  },
-  "jest": {
+    "build": "parcel build src/index.html --out-dir docs --public-url /Homework_08_Radials_more_small_multiples"
+    },
+    "jest": {
     "setupFiles": [
       "<rootDir>/tests/setupTests.js"
     ]

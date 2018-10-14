@@ -27,7 +27,8 @@ let arc = d3
 let colorScale = d3
   // different type of scale
   .scaleQuantize()
-  .range(['#e5f5e0', '#a1d99b', '#31a354', '#feb24c', '#f03b20', '#c51b8a'])
+  .range(['#e5f5e0', '#a1d99b', '#31a354'])
+// '#feb24c', '#f03b20', '#c51b8a
 
 let arcLabel = d3
   .arc()
