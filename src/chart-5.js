@@ -14,115 +14,115 @@ let svg = d3
   .append('g')
   .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
-let radiusScale = d3.scaleLinear().range([30, 80])
+let radiusScale = d3
+  .scaleLinear()
+  .domain([0, 100])
+  .range([30, 80])
 
 let angleScale = d3.scaleBand().range([0, Math.PI * 2])
 
 let line = d3
   .radialArea()
-  .outerRadius(d => radiusScale(d.high_temp))
   .innerRadius(d => radiusScale(d.low_temp))
+  .outerRadius(d => radiusScale(d.high_temp))
   .angle(d => angleScale(d.month_name))
 
-let xPositionScale = d3.scaleBand().range([0, width])
+let xPositionScale = d3
+  .scalePoint()
+  .range([0, width])
+  .padding(0.3)
 
-d3.csv(require('./data/ny-temps.csv'))
+d3.csv(require('./data/all-temps.csv'))
   .then(ready)
   .catch(err => console.log('Failed on', err))
 
 function ready(datapoints) {
-  let nested = d3
-    .nest()
-    .key(function(d) {
-      return d.city
-    })
-    .entries(datapoints)
-
-  let keys = nested.map(d => d.key)
-  xPositionScale.domain(keys)
-
-  let allTemp = datapoints.map(d => +d.high_temp)
-  radiusScale.domain([0, d3.max(allTemp)])
-
-  let bands = [20, 40, 60, 80, 100]
-  let bandNumbers = [20, 60, 100]
-
   let months = datapoints.map(d => d.month_name)
   angleScale.domain(months)
+
+  let cities = datapoints.map(d => d.city)
+  xPositionScale.domain(cities)
+
+  let nested = d3
+    .nest()
+    .key(d => d.city)
+    .entries(datapoints)
 
   svg
     .append('text')
     .text('Average Monthly Temperatures')
     .attr('text-anchor', 'middle')
     .attr('font-size', 30)
-    .attr('font-weight', 'bold')
+    .attr('y', 30)
     .attr('x', width / 2)
-    .attr('y', 0)
-    .attr('dy', 25)
+    .attr('font-weight', '600')
 
   svg
     .append('text')
     .text('in cities around the world')
     .attr('text-anchor', 'middle')
     .attr('font-size', 20)
-    .attr('font-weight', 600)
+    .attr('y', 55)
     .attr('x', width / 2)
-    .attr('y', 0)
-    .attr('dy', 60)
 
   svg
-    .selectAll('.chart-5-graph')
+    .selectAll('.small-charts')
     .data(nested)
     .enter()
+    .append('g')
+    .attr('class', 'small-charts')
+    .attr('height', height + margin.top + margin.bottom)
+    .attr('width', width + margin.left + margin.right)
+    .attr('transform', d => {
+      return `translate(${xPositionScale(d.key)}, ${height / 2})`
+    })
     .each(function(d) {
-      let graphX = xPositionScale(d.key) + 90
+      let svg = d3.select(this)
+      let datapoints = d.values
+      datapoints.push(datapoints[0])
 
-      let container = d3
-        .select(this)
-        .append('g')
-        .attr('transform', `translate(${graphX},${height / 2})`)
-
-      d.values.push(d.values[0])
-
-      container
+      svg
         .append('path')
-        .datum(d.values)
+        .datum(datapoints)
         .attr('d', line)
-        .attr('fill', '#e6550d')
-        .attr('opacity', 0.5)
+        .attr('fill', 'red')
         .attr('stroke', 'none')
+        .attr('opacity', 0.5)
 
-      container
+      let bands = [20, 40, 60, 80, 100]
+      let bandsNumbers = [20, 60, 100]
+
+      svg
         .selectAll('.scale-band')
         .data(bands)
         .enter()
         .append('circle')
         .attr('r', d => radiusScale(d))
         .attr('fill', 'none')
-        .attr('stroke', 'darkgrey')
+        .attr('stroke', 'lightgrey')
         .attr('cx', 0)
         .attr('cy', 0)
         .lower()
 
-      container
+      svg
         .selectAll('.scale-text')
-        .data(bandNumbers)
+        .data(bandsNumbers)
         .enter()
         .append('text')
-        .text(d => d)
+        .attr('class', 'scale-text')
+        .text(d => d + '°')
         .attr('text-anchor', 'middle')
-        .attr('font-size', 10)
         .attr('x', 0)
         .attr('y', d => -radiusScale(d))
+        .attr('dy', -2)
+        .attr('font-size', 12)
 
-      container
+      svg
         .append('text')
         .text(d.key)
-        .attr('x', 0)
-        .attr('y', 0)
         .attr('text-anchor', 'middle')
         .attr('font-size', 15)
-        .attr('font-weight', 'bold')
-        .attr('alignment-baseline', 'middle')
+        .attr('y', 0)
+        .attr('font-weight', '600')
     })
 }

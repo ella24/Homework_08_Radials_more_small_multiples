@@ -20,26 +20,26 @@ let pie = d3.pie().value(function(d) {
   return d.minutes
 })
 
-let radius = 110
+let radius = 150
 
 let arc = d3
   .arc()
   .innerRadius(0)
   .outerRadius(radius)
 
-let colorScale = d3.scaleOrdinal().range(['#fde0dd', '#fa9fb5', '#c51b8a'])
-
-let arcLabel = d3
+let labelArc = d3
   .arc()
   .innerRadius(0)
-  .outerRadius(radius + 10)
+  .outerRadius(radius + 155)
+
+let colorScale = d3.scaleOrdinal().range(['#7fc97f', '#a8ddb5', '#2b8cbe'])
 
 d3.csv(require('./data/time-breakdown.csv'))
   .then(ready)
   .catch(err => console.log('Failed with', err))
 
 function ready(datapoints) {
-  let container = svg.append('g').attr('transform', 'translate(200,200')
+  let container = svg.append('g').attr('transform', 'translate(200,200)')
 
   container
     .selectAll('path')
@@ -50,19 +50,15 @@ function ready(datapoints) {
     .attr('fill', d => colorScale(d.data.task))
 
   container
-    .selectAll('.pie-text')
+    .selectAll('.task-text')
     .data(pie(datapoints))
     .enter()
     .append('text')
     .text(d => d.data.task)
-    .attr('x', d => {
-      return arcLabel.centroid(d)[0]
-    })
-    .attr('x', d => {
-      return arcLabel.centroid(d)[1]
-    })
+    .attr('d', d => labelArc(d))
+    .style('font-size', 12)
     .attr('transform', function(d) {
-      return 'translate(' + arcLabel.centroid(d) + ')'
+      return 'translate(' + labelArc.centroid(d) + ')'
     })
     .attr('text-anchor', function(d) {
       if (d.startAngle > Math.PI) {
