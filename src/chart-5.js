@@ -54,7 +54,7 @@ function ready(datapoints) {
     .append('text')
     .text('Average Monthly Temperatures')
     .attr('text-anchor', 'middle')
-    .attr('font-size', 20)
+    .attr('font-size', 30)
     .attr('font-weight', 'bold')
     .attr('x', width / 2)
     .attr('y', 0)
@@ -71,7 +71,7 @@ function ready(datapoints) {
     .attr('dy', 60)
 
   svg
-    .selectAll('.chart-3c-graph')
+    .selectAll('.chart-5-graph')
     .data(nested)
     .enter()
     .each(function(d) {
@@ -88,8 +88,8 @@ function ready(datapoints) {
         .append('path')
         .datum(d.values)
         .attr('d', line)
-        .attr('fill', 'red')
-        .attr('opacity', 0.3)
+        .attr('fill', '#e6550d')
+        .attr('opacity', 0.5)
         .attr('stroke', 'none')
 
       container

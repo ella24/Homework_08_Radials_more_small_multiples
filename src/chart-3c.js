@@ -1,12 +1,10 @@
 import * as d3 from 'd3'
 
-let margin = { top: 30, left: 30, right: 30, bottom: 30 }
+var margin = { top: 30, left: 30, right: 30, bottom: 30 }
+var height = 400 - margin.top - margin.bottom
+var width = 1080 - margin.left - margin.right
 
-let height = 400 - margin.top - margin.bottom
-
-let width = 1080 - margin.left - margin.right
-
-let svg = d3
+var svg = d3
   .select('#chart-3c')
   .append('svg')
   .attr('height', height + margin.top + margin.bottom)
@@ -14,96 +12,82 @@ let svg = d3
   .append('g')
   .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
-let months = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sept',
-  'Oct',
-  'Nov',
-  'Dec',
-  'Blah'
-]
-
-let pie = d3
+var pie = d3
   .pie()
   .value(1 / 12)
   .sort(null)
 
-let radiusScale = d3.scaleLinear().range([0, 90])
+let radius = 100
 
-let arc = d3
+let radiusScale = d3
+  .scaleLinear()
+  .domain([0, 120])
+  .range([0, radius])
+
+var xPositionScale = d3
+  .scalePoint()
+  .range([0, width])
+  .padding(0.2)
+
+var colorScale = d3
+  .scaleLinear()
+  .domain([0, 120])
+  .range(['#b3cde3', '#fbb4b9'])
+
+var arc = d3
   .arc()
   .innerRadius(d => radiusScale(d.data.low_temp))
   .outerRadius(d => radiusScale(d.data.high_temp))
-
-let colorScale = d3
-  // different type of scale
-  .scaleQuantize()
-  .range(['#e5f5e0', '#a1d99b', '#31a354'])
-
-let xPositionScale = d3.scaleBand().range([0, width])
 
 d3.csv(require('./data/all-temps.csv'))
   .then(ready)
   .catch(err => console.log('Failed on', err))
 
 function ready(datapoints) {
-  let nested = d3
+  var nested = d3
     .nest()
-    .key(function(d) {
-      return d.city
-    })
+    .key(d => d.city)
     .entries(datapoints)
 
   // console.log(nested)
 
-  let keys = nested.map(d => d.key)
-  xPositionScale.domain(keys)
+  var cities = datapoints.map(d => d.city)
 
-  let allTemp = datapoints.map(d => +d.high_temp)
-  colorScale.domain(d3.extent(allTemp))
-  radiusScale.domain([0, d3.max(allTemp)])
+  xPositionScale.domain(cities)
 
   svg
-    .selectAll('.chart-3c-graph')
+    .selectAll('.small-charts')
     .data(nested)
     .enter()
+    .append('g')
+    .attr('class', 'small-charts')
+    .attr('height', height + margin.top + margin.bottom)
+    .attr('width', width + margin.left + margin.right)
+    .attr('transform', function(d) {
+      return `translate(${xPositionScale(d.key)}, 100)`
+    })
     .each(function(d) {
-      // distribute it across the x axis.
-      let graphX = xPositionScale(d.key) + 90
+      let svg = d3.select(this)
 
-      let container = d3
-        .select(this)
-        .append('g')
-        .attr('transform', `translate(${graphX},${height / 2})`)
+      svg.append('g').attr('transform', `translate(${width / 2},${height / 2})`)
 
-      container
-        .selectAll('.chart-3c-path')
+      svg
+        .selectAll('.temp-bar')
         .data(pie(d.values))
         .enter()
         .append('path')
-        .attr('class', 'chart-3c-path')
         .attr('d', d => arc(d))
         .attr('fill', d => colorScale(d.data.high_temp))
-
-      container
+      svg
+        .append('circle')
+        .attr('r', 2)
+        .attr('cx', 0)
+        .attr('cy', 0)
+      svg
         .append('text')
         .text(d.key)
         .attr('text-anchor', 'middle')
         .attr('font-size', 20)
-        .attr('dy', 120)
-        .attr('font-weight', 'bold')
-
-      container
-        .append('circle')
-        .attr('r', 2.5)
-        .attr('x', 0)
-        .attr('y', 0)
+        .attr('y', 120)
     })
 }

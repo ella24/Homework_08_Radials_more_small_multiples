@@ -33,21 +33,21 @@ d3.csv(require('./data/nba.csv'))
 function ready(datapoints) {
   let player = datapoints[0]
 
-  let leBron = [
-    { name: 'Minutes', value: player.MP, max: 60 },
-    { name: 'Points', value: player.PTS, max: 30 },
-    { name: 'Field Goals', value: player.FG, max: 10 },
-    { name: '3-Point Field Goals', value: player.ThreeP, max: 5 },
+  let James = [
     { name: 'Free Throws', value: player.FT, max: 10 },
     { name: 'Rebounds', value: player.TRB, max: 15 },
     { name: 'Assists', value: player.AST, max: 10 },
     { name: 'Steals', value: player.STL, max: 5 },
-    { name: 'Blocks', value: player.BLK, max: 5 }
+    { name: 'Blocks', value: player.BLK, max: 5 },
+    { name: 'Minutes', value: player.MP, max: 60 },
+    { name: 'Points', value: player.PTS, max: 30 },
+    { name: 'Field Goals', value: player.FG, max: 10 },
+    { name: '3-Point Field Goals', value: player.ThreeP, max: 5 }
   ]
 
-  leBron.push(leBron[0])
+  James.push(James[0])
 
-  let categories = leBron.map(d => d.name)
+  let categories = James.map(d => d.name)
   angleScale.domain(categories)
 
   let bands = [0.2, 0.4, 0.6, 0.8, 1]
@@ -57,7 +57,7 @@ function ready(datapoints) {
     .attr('transform', `translate(${width / 2},${height / 2})`)
 
   container
-    .datum(leBron)
+    .datum(James)
     .append('mask')
     .attr('id', 'color-mask')
     .append('path')
@@ -84,15 +84,15 @@ function ready(datapoints) {
     .attr('mask', 'url(#color-mask)')
 
   container
-    .selectAll('.lable-text')
-    .data(leBron)
+    .selectAll('.label-text')
+    .data(James)
     .enter()
     .append('text')
     .attr('class', 'label-text')
     .text(d => d.name)
     .attr('font-weight', 'bold')
     .attr('text-anchor', 'middle')
-    .attr('font-size', 13)
+    .attr('font-size', 12)
     .attr('alignment-baseline', 'middle')
     .attr('transform', d => {
       let r = radius + 14
@@ -126,7 +126,7 @@ function ready(datapoints) {
   d3.selectAll('.scale-band').each(function(percentage, i) {
     container
       .selectAll('.label-tick')
-      .data(leBron)
+      .data(James)
       .enter()
       .append('text')
       .text(d => d.max * percentage)
@@ -150,7 +150,7 @@ function ready(datapoints) {
     .attr('text-anchor', 'middle')
     .attr('font-size', 25)
     .attr('alignment-baseline', 'middle')
-    .text('LeBron James')
+    .text('Lebron James')
     .attr('y', -radiusScale(1) - 70)
 
   container
@@ -161,4 +161,12 @@ function ready(datapoints) {
     .attr('alignment-baseline', 'middle')
     .text('Cleveland Cavaliers')
     .attr('y', -radiusScale(1) - 50)
+
+  container
+    .append('circle')
+    .attr('r', 2)
+    .attr('fill', 'black')
+    .attr('stroke', 'black')
+    .attr('x', 0)
+    .attr('y', 0)
 }
